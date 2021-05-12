@@ -12,4 +12,5 @@ import lombok.ToString;
 public class Asset {
     public String id;
     public String address;
+    public boolean inCharge;
 }

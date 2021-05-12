@@ -24,10 +24,16 @@ public class DeltaEngine {
     }
 
     private List<Event> determineDelta(Asset newAsset, Asset prevAsset) {
+        List<Event> events = new ArrayList<>();
+
         if(!newAsset.getAddress().equals(prevAsset.getAddress())) {
-            return Collections.singletonList(new AssetChangedEvent(newAsset.id, "address", prevAsset.address, newAsset.address));
+            events.add(new AssetChangedEvent(newAsset.id, "address", prevAsset.address, newAsset.address));
         }
 
-        return new ArrayList<>();
+        if(!newAsset.isInCharge() == prevAsset.isInCharge()) {
+            events.add(new AssetChangedEvent(newAsset.id, "inCharge", String.valueOf(prevAsset.inCharge), String.valueOf(newAsset.inCharge)));
+        }
+
+        return events;
     }
 }

@@ -16,7 +16,7 @@ public class TestDataMaker {
         Asset[] assets = new Asset[numberOfAssets];
 
         for(int i = 0; i < assets.length; i++) {
-            assets[i] = new Asset(UUID.randomUUID().toString(), DEFAULT_ADDRESS);
+            assets[i] = new Asset(UUID.randomUUID().toString(), DEFAULT_ADDRESS, true);
         }
 
         return assets;
