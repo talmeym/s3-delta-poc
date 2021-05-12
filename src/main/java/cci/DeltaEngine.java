@@ -12,9 +12,10 @@ public class DeltaEngine {
             return Arrays.stream(currentData).map(SynchronizationEvent::new).collect(Collectors.toList());
         }
 
-        List<Event> events = new ArrayList<>();
         Map<String, Asset> newDataById = Arrays.stream(currentData).collect(Collectors.toMap(Asset::getId, asset -> asset));
         Map<String, Asset> prevDataById = Arrays.stream(prevData).collect(Collectors.toMap(Asset::getId, asset -> asset));
+        List<Event> events = new ArrayList<>();
+
         newDataById.keySet().stream().filter(id -> !prevDataById.containsKey(id)).forEach(id -> events.add(new AssetAddedEvent(newDataById.get(id))));
         prevDataById.keySet().stream().filter(id -> !newDataById.containsKey(id)).forEach(id -> events.add(new AssetRemovedEvent(id)));
         newDataById.values().stream().filter(a -> prevDataById.containsKey(a.getId())).forEach(a -> events.addAll(determineDelta(a, prevDataById.get(a.getId()))));
