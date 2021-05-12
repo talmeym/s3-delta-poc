@@ -2,8 +2,8 @@ package cci;
 
 import static cci.Constants.FILE_OPS;
 import static cci.FileOperations.FileStatus.*;
+import static cci.FileOperations.getHashFileName;
 import static cci.FileOperations.getProcessedFileName;
-import static cci.HashingUtil.getHashFileName;
 import static cci.HashingUtil.md5Hash;
 
 public abstract class AbstractFO implements FileOperations {
@@ -26,18 +26,17 @@ public abstract class AbstractFO implements FileOperations {
         String hashFileName = getHashFileName(fileName);
         byte[] md5 = readFile(hashFileName);
         deleteFile(hashFileName);
-        writeFile(getProcessedFileName(hashFileName), md5);
+        writeFile(getProcessedFileName(fileName), md5);
     }
 
     @Override
     public final FileStatus getFileStatus(String fileName) throws Exception {
         String hashFileName = getHashFileName(fileName);
-        String processedFileName = getProcessedFileName(getHashFileName(fileName));
+        String processedFileName = getProcessedFileName(fileName);
 
         if(fileExists(hashFileName) && fileExists(processedFileName)) {
             throw new IllegalStateException(String.format("hash file and processed file exist for %s", fileName));
         }
-
 
         if(FILE_OPS.fileExists(hashFileName) || FILE_OPS.fileExists(processedFileName)) {
             String contents = new String(FILE_OPS.readFile(FILE_OPS.fileExists(hashFileName) ? hashFileName : processedFileName));

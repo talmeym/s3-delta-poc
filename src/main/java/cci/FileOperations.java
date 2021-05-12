@@ -3,6 +3,8 @@ package cci;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static cci.Constants.MD5_SUFFIX;
+
 public interface FileOperations {
     boolean fileExists(String name);
     byte[] readFile(String fileName) throws Exception;
@@ -21,6 +23,10 @@ public interface FileOperations {
     }
 
     static String getProcessedFileName(String fileName) {
-        return fileName + Constants.PROCESSED_SUFFIX;
+        return getHashFileName(fileName) + Constants.PROCESSED_SUFFIX;
+    }
+
+    static String getHashFileName(String fileName) {
+        return fileName + MD5_SUFFIX;
     }
 }
