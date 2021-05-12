@@ -19,6 +19,6 @@ public class Constants {
     public static AmazonS3 S3_CLIENT = AmazonS3ClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(AWS_ENDPOINT, AWS_REGION)).build();;
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    public static final FileOperations FILE_OPS = new AwsS3FO();
+    public static final FileOperations FILE_OPS = new FileSystemFO();
     public static final DeltaEngine DELTA_ENGINE = new DeltaEngine();
 }
