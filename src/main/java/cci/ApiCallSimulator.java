@@ -1,27 +1,29 @@
 package cci;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static cci.Constants.*;
-import static cci.FileUtil.FileStatus.READY;
-import static cci.FileUtil.getFileDirectory;
+import static cci.FileOperations.FileStatus.READY;
 
 public class ApiCallSimulator {
 
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT);
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws Exception {
         Asset[] assets = callBroadcastAPIAndConvertToCommonFormat();
 
-        File outputFile = new File(getFileDirectory(), BROADCAST_FILE_PREFIX + DATE_FORMATTER.format(new Date()) + JSON_SUFFIX);
-        OBJECT_MAPPER.writeValue(outputFile, assets);
+        String fileName = BROADCAST_FILE_PREFIX + DATE_FORMATTER.format(new Date()) + JSON_SUFFIX;
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        OBJECT_MAPPER.writeValue(outputStream, assets);
+        FILE_OPS.writeFile(fileName, outputStream.toByteArray());
 
         if(makeReady(args)) {
-            FILE_UTIL.markAsReady(outputFile);
+            FILE_OPS.markAsReady(fileName);
         }
     }
 

@@ -1,38 +1,33 @@
 package cci;
 
-import cci.FileUtil.FileStatus;
+import cci.FileOperations.FileStatus;
 import cci.events.Event;
 import lombok.Data;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cci.Constants.*;
-import static cci.FileUtil.getFileDirectory;
 
 public class FileProcessor {
-    public static void main(String[] args) {
-        String[] jsonFilenames = getFileDirectory().list((file, name) -> name.endsWith(JSON_SUFFIX));
+    public static void main(String[] args) throws Exception {
+        List<String> jsonFiles = FILE_OPS.listFiles((name) -> name.endsWith(JSON_SUFFIX));
 
-        if(jsonFilenames != null && jsonFilenames.length > 0) {
-            Map<Date, String> fileNamesByDate = Arrays.stream(jsonFilenames).collect(Collectors.toMap(FileProcessor::getDateFrom, filename -> filename));
-            System.out.println(jsonFilenames.length + " json files found");
+        if(jsonFiles != null && jsonFiles.size() > 0) {
+            Map<Date, String> fileNamesByDate = jsonFiles.stream().collect(Collectors.toMap(FileProcessor::getDateFrom, filename -> filename));
+            System.out.println(jsonFiles.size() + " json files found");
 
             AtomicAssetStore previousFileData = new AtomicAssetStore();
 
             fileNamesByDate.keySet().stream().sorted().forEach(date -> {
                 String fileName = fileNamesByDate.get(date);
-                File file = new File(getFileDirectory(), fileName);
 
                 try {
-                    FileStatus fileStatus = FILE_UTIL.getFileStatus(file);
+                    FileStatus fileStatus = FILE_OPS.getFileStatus(fileName);
 
                     switch(fileStatus) {
                         case INCOMPLETE:
@@ -40,15 +35,15 @@ public class FileProcessor {
                             System.exit(0);
                         case READY:
                             System.out.print("Processing file " + fileName + " .. ");
-                            Asset[] fileData = readAssetData(file);
+                            Asset[] fileData = readAssetData(fileName);
                             List<Event> events = DELTA_ENGINE.determineDelta(fileData, previousFileData.getData());
                             System.out.println(events.size() + " events: " + events);
-                            FILE_UTIL.markAsProcessed(file);
+                            FILE_OPS.markAsProcessed(fileName);
                             previousFileData.setData(fileData);
                             break;
                         case PROCESSED:
                             System.out.println("Skipping processed file " + fileName);
-                            previousFileData.setData(readAssetData(file));
+                            previousFileData.setData(readAssetData(fileName));
                             break;
                         case INVALID:
                             System.out.println("Stopping processing at invalid file: " + fileName);
@@ -64,8 +59,8 @@ public class FileProcessor {
         }
     }
 
-    private static Asset[] readAssetData(File file) throws java.io.IOException {
-        return OBJECT_MAPPER.reader().readValue(new FileInputStream(file), Asset[].class);
+    private static Asset[] readAssetData(String name) throws Exception {
+        return OBJECT_MAPPER.reader().readValue(FILE_OPS.readFile(name), Asset[].class);
     }
 
     private static Date getDateFrom(String fileName) {
