@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static cci.Constants.LOCATION;
+import static cci.Constants.BUCKET_NAME;
 import static cci.Constants.S3_CLIENT;
 
 public class AwsS3FO extends AbstractFO {
     @Override
     public boolean fileExists(String name) {
-        return S3_CLIENT.doesObjectExist(LOCATION, name);
+        return S3_CLIENT.doesObjectExist(BUCKET_NAME, name);
     }
 
     @Override
     public byte[] readFile(String fileName) throws IOException {
-        S3Object s3Object = S3_CLIENT.getObject(LOCATION, fileName);
+        S3Object s3Object = S3_CLIENT.getObject(BUCKET_NAME, fileName);
         InputStream inputStream = s3Object.getObjectContent();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -40,16 +40,16 @@ public class AwsS3FO extends AbstractFO {
 
     @Override
     public void writeFile(String fileName, byte[] bytes) {
-        if(!S3_CLIENT.doesBucketExist(LOCATION)) {
-            S3_CLIENT.createBucket(LOCATION);
+        if(!S3_CLIENT.doesBucketExist(BUCKET_NAME)) {
+            S3_CLIENT.createBucket(BUCKET_NAME);
         }
 
-        S3_CLIENT.putObject(LOCATION, fileName, new String(bytes));
+        S3_CLIENT.putObject(BUCKET_NAME, fileName, new String(bytes));
     }
 
     @Override
     public List<String> listFiles(Predicate<String> filter) {
-        List<S3ObjectSummary> objectSummaries = S3_CLIENT.listObjects(LOCATION).getObjectSummaries();
+        List<S3ObjectSummary> objectSummaries = S3_CLIENT.listObjects(BUCKET_NAME).getObjectSummaries();
         return objectSummaries.stream().map(S3ObjectSummary::getKey).filter(filter).collect(Collectors.toList());
     }
 

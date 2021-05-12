@@ -35,7 +35,7 @@ public class FileSystemFO extends AbstractFO {
         String[] files = getDirectory().list();
 
         if(files == null) {
-            throw new IllegalArgumentException(String.format("directory %s not found", LOCATION));
+            throw new IllegalArgumentException(String.format("directory %s not found", BUCKET_NAME));
         }
 
         return Arrays.stream(files).filter(filter).collect(Collectors.toList());
@@ -46,7 +46,7 @@ public class FileSystemFO extends AbstractFO {
     }
 
     private File getDirectory() {
-        File bucketDir = new File(new File("s3"), LOCATION);
+        File bucketDir = new File(new File("s3"), BUCKET_NAME);
 
         if(!bucketDir.exists()) {
             boolean made = bucketDir.mkdirs();
