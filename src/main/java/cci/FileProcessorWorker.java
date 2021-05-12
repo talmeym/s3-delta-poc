@@ -13,12 +13,25 @@ import java.util.stream.Collectors;
 
 import static cci.Constants.*;
 
-public class FileProcessor {
+public class FileProcessorWorker {
+    private static Asset[] readAssetData(String name) throws Exception {
+        return OBJECT_MAPPER.reader().readValue(FILE_OPS.readFile(name), Asset[].class);
+    }
+
+    private static Date getDateFrom(String fileName) {
+        try {
+            String dateString = fileName.substring(fileName.indexOf('_') + 1, fileName.indexOf('.'));
+            return new SimpleDateFormat(Constants.DATE_FORMAT).parse(dateString);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("File has invalid filename format: " + fileName);
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         List<String> jsonFiles = FILE_OPS.listFiles((name) -> name.endsWith(JSON_SUFFIX));
 
         if(jsonFiles != null && jsonFiles.size() > 0) {
-            Map<Date, String> fileNamesByDate = jsonFiles.stream().collect(Collectors.toMap(FileProcessor::getDateFrom, filename -> filename));
+            Map<Date, String> fileNamesByDate = jsonFiles.stream().collect(Collectors.toMap(FileProcessorWorker::getDateFrom, filename -> filename));
             System.out.println(jsonFiles.size() + " json files found");
 
             AtomicAssetStore previousFileData = new AtomicAssetStore();
@@ -59,21 +72,9 @@ public class FileProcessor {
         }
     }
 
-    private static Asset[] readAssetData(String name) throws Exception {
-        return OBJECT_MAPPER.reader().readValue(FILE_OPS.readFile(name), Asset[].class);
-    }
-
-    private static Date getDateFrom(String fileName) {
-        try {
-            String dateString = fileName.substring(fileName.indexOf('_') + 1, fileName.indexOf('.'));
-            return new SimpleDateFormat(Constants.DATE_FORMAT).parse(dateString);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("File has invalid filename format: " + fileName);
-        }
-    }
-
     @Data
     public static class AtomicAssetStore {
+
         private Asset[] data;
     }
 }

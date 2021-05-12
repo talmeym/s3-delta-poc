@@ -9,9 +9,21 @@ import java.util.Date;
 import static cci.Constants.*;
 import static cci.FileOperations.FileStatus.READY;
 
-public class ApiCallSimulator {
+public class ApiCallerWorker {
 
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT);
+
+    /**
+     * A method pretending to be the function of calling the broadcast API and converting the returned data into common format.
+     * It actually it just loads common format data from a file ;-)
+     */
+    private static Asset[] callBroadcastAPIAndConvertToCommonFormat() throws IOException {
+        return OBJECT_MAPPER.reader().readValue(new File(BROADCAST_COMMON_MODEL_FILE), Asset[].class);
+    }
+
+    private static boolean makeReady(String[] args) {
+        return args!= null && args.length > 0 && args[0] != null && args[0].equals(READY.name());
+    }
 
     public static void main(String[] args) throws Exception {
         Asset[] assets = callBroadcastAPIAndConvertToCommonFormat();
@@ -25,17 +37,5 @@ public class ApiCallSimulator {
         if(makeReady(args)) {
             FILE_OPS.markAsReady(fileName);
         }
-    }
-
-    /**
-     * A method pretending to be the function of calling the broadcast API and converting the returned data into common format.
-     * It actually it just loads common format data from a file ;-)
-     */
-    private static Asset[] callBroadcastAPIAndConvertToCommonFormat() throws IOException {
-        return OBJECT_MAPPER.reader().readValue(new File(BROADCAST_COMMON_MODEL_FILE), Asset[].class);
-    }
-
-    private static boolean makeReady(String[] args) {
-        return args!= null && args.length > 0 && args[0] != null && args[0].equals(READY.name());
     }
 }
