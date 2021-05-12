@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.12'
+    compile 'org.testcontainers:localstack:1.8.3'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
@@ -36,7 +37,6 @@ dependencies {
     implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
     compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.860'
 
-    testCompile 'org.testcontainers:localstack:1.8.3'
 }
 
 mainClassName = 'cci.Main'
