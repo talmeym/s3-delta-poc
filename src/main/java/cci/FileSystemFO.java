@@ -31,6 +31,13 @@ public class FileSystemFO extends AbstractFO {
     }
 
     @Override
+    public void deleteFile(String fileName) {
+        if(!getFile(fileName).delete()) {
+            throw new IllegalStateException(String.format("file %s not deleted", fileName));
+        }
+    }
+
+    @Override
     public List<String> listFiles(Predicate<String> filter) {
         String[] files = getDirectory().list();
 
@@ -61,10 +68,10 @@ public class FileSystemFO extends AbstractFO {
 
     public static void main(String[] args) throws Exception {
         if(args != null && args.length > 1) {
-            File file = new File(args[0]);
+            FileSystemFO fileSystemFO = new FileSystemFO();
+            File file = fileSystemFO.getFile(args[0]);
 
             if(file.exists()) {
-                FileSystemFO fileSystemFO = new FileSystemFO();
                 String action = args[1];
 
                 if(READY.name().equals(action)) {

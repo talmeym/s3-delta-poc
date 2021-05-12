@@ -7,6 +7,7 @@ public interface FileOperations {
     boolean fileExists(String name);
     byte[] readFile(String fileName) throws Exception;
     void writeFile(String fileName, byte[] bytes) throws Exception;
+    void deleteFile(String fileName) throws Exception;
     List<String> listFiles(Predicate<String> filter) throws Exception;
     FileSystemFO.FileStatus getFileStatus(String fileName) throws Exception;
     void markAsReady(String fileName) throws Exception;
@@ -17,5 +18,9 @@ public interface FileOperations {
         READY,
         INVALID,
         PROCESSED
+    }
+
+    static String getProcessedFileName(String fileName) {
+        return fileName + Constants.PROCESSED_SUFFIX;
     }
 }

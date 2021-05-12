@@ -51,6 +51,11 @@ public class AwsS3FO extends AbstractFO {
     }
 
     @Override
+    public void deleteFile(String fileName) throws Exception {
+        S3_CLIENT.deleteObject(BUCKET_NAME, fileName);
+    }
+
+    @Override
     public List<String> listFiles(Predicate<String> filter) {
         List<S3ObjectSummary> objectSummaries = S3_CLIENT.listObjects(BUCKET_NAME).getObjectSummaries();
         return objectSummaries.stream().map(S3ObjectSummary::getKey).filter(filter).collect(Collectors.toList());
