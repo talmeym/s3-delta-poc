@@ -22,7 +22,10 @@ public class AwsS3FO extends AbstractFO {
     @Override
     public byte[] readFile(String fileName) throws IOException {
         S3Object s3Object = S3_CLIENT.getObject(BUCKET_NAME, fileName);
-        InputStream inputStream = s3Object.getObjectContent();
+        return readBytes(s3Object.getObjectContent());
+    }
+
+    private byte[] readBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         byte[] buffer = new byte[1024];
